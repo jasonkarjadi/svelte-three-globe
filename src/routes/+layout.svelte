@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import {
-    BoxGeometry,
-    Mesh,
+    AmbientLight,
+    DirectionalLight,
     PerspectiveCamera,
     Raycaster,
     Scene,
@@ -10,6 +10,7 @@
     WebGLRenderer,
   } from "three";
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+  import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
   import "./styles.scss";
 
   let canvas: HTMLCanvasElement,
@@ -18,12 +19,16 @@
     requestID = 0;
 
   const scene = new Scene(),
-    camera = new PerspectiveCamera(50, 2, 1, 1000),
+    camera = new PerspectiveCamera(50, 2, 1, 5000),
     mouse = new Vector2(),
-    raycaster = new Raycaster();
+    raycaster = new Raycaster(),
+    gltfLoader = new GLTFLoader(),
+    directionalLight = new DirectionalLight(0xffffff, 2),
+    ambientLight = new AmbientLight(0x404040, 2);
 
-  camera.position.set(0, 0, 200);
-  scene.add(new Mesh(new BoxGeometry(50, 50, 50, 50, 50, 50)));
+  camera.position.set(0, 0, 1500);
+  directionalLight.position.y += 1000;
+  scene.add(camera.add(directionalLight), ambientLight);
 
   onMount(() => {
     const renderer = new WebGLRenderer({ canvas, antialias: false });
@@ -34,9 +39,22 @@
       rotateSpeed: 0.5,
       enablePan: false,
       enableZoom: true,
-      minDistance: 50 * 1.1,
-      maxDistance: camera.far - 50,
+      minDistance: 800,
+      maxDistance: camera.far - 1000,
     });
+    gltfLoader.load(
+      "/earth.glb",
+      (gltf) => {
+        gltf.scene.children[0].rotateY(4);
+        scene.add(gltf.scene);
+      },
+      (xhr) => {
+        // console.log(`${(xhr.loaded / xhr.total) * 100}% loaded`);
+      },
+      (err) => {
+        console.error(err);
+      }
+    );
 
     const resize = () => {
       camera.aspect = width / height;
