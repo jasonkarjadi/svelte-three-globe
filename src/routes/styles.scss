@@ -85,6 +85,8 @@ video {
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
+  box-sizing: border-box;
+  color: #cbd5e0;
 }
 
 ol,
@@ -110,7 +112,7 @@ video {
 }
 
 html {
-  background-color: black;
+  background-color: #1a202c;
   overflow: hidden;
 }
 
@@ -121,4 +123,36 @@ canvas {
 button,
 input {
   cursor: pointer;
+  color: #cbd5e0;
+  background-color: transparent;
+  border: none;
+  font-size: 1.25rem;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.top-0 {
+  top: 0;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.flex {
+  display: flex;
 }
