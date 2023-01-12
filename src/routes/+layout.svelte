@@ -2,11 +2,11 @@
   import { onMount } from "svelte";
   import {
     AmbientLight,
-    Color,
     DirectionalLight,
     PerspectiveCamera,
     Raycaster,
     Scene,
+    sRGBEncoding,
     WebGLRenderer,
   } from "three";
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -24,16 +24,16 @@
     camera = new PerspectiveCamera(50, 2, 1, 5000),
     raycaster = new Raycaster(),
     gltfLoader = new GLTFLoader(),
-    directionalLight = new DirectionalLight(0xffffff, 2),
-    ambientLight = new AmbientLight(0xedf2f7, 1);
+    dirLight = new DirectionalLight(0xffffff, 1),
+    ambLight = new AmbientLight(0x404040, 1);
 
   camera.position.setZ(2000);
-  directionalLight.position.y += 800;
-  scene.background = new Color(0x0e0e10);
-  scene.add(camera.add(directionalLight), ambientLight);
+  dirLight.position.set(0, 0.5, 1);
+  scene.add(camera, dirLight, ambLight);
 
   onMount(() => {
     const renderer = new WebGLRenderer({ canvas, antialias: false });
+    renderer.outputEncoding = sRGBEncoding;
     const controls = new OrbitControls(camera, canvas);
     Object.assign(controls, {
       enableDamping: true,
@@ -67,6 +67,8 @@
 
     const animate = () => {
       controls.update();
+      dirLight.position.x = Math.sin(requestID / 240); // desktop = 144Hz // mobile = 60Hz
+      dirLight.position.z = Math.cos(requestID / 240);
       renderer.render(scene, camera);
       requestID = requestAnimationFrame(animate);
     };
@@ -87,7 +89,7 @@
   <nav class="topleft">
     <button><i class="fa-solid fa-bars" /></button>
   </nav>
-  <div class="topmiddle" />
+  <div class="topmiddle"><div /></div>
   <div class="topright"><button><i class="fa-solid fa-gear" /></button></div>
 </header>
 <main>
@@ -97,16 +99,16 @@
 <footer>
   <button on:click={() => {}}>
     {#if false}
-      Open
+      Select
     {:else}
       <i class="fa-solid fa-rectangle-xmark" />
-      Close
+      Deselect
     {/if}
   </button>
 </footer>
 
 <style lang="scss">
-  $my-border: solid #2d3748 1px;
+  $my-border: solid #2d3748 2px;
   $color-jetblack: #0e0e10;
 
   header,
@@ -148,8 +150,11 @@
       border-top: $my-border;
     }
   }
+  main {
+    margin: 1rem 0 0.5rem;
+  }
   canvas {
-    margin: 1rem auto 0.5rem;
+    margin: 0 auto;
     border-radius: 1rem;
     box-shadow: 0 0 5px 2px $color-jetblack;
     border: $my-border;
